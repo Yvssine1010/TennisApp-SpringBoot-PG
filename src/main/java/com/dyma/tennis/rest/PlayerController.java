@@ -2,6 +2,7 @@ package com.dyma.tennis.rest;
 
 import com.dyma.tennis.HealthCheck;
 import com.dyma.tennis.Player;
+import com.dyma.tennis.PlayerList;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -32,9 +33,8 @@ public class PlayerController {
     })
     @GetMapping
     public List<Player> list() {
-        return Collections.emptyList();
+        return PlayerList.ALL;
     }
-
     @Operation(summary = "Finds player", description = "Finds player")//décrit ce que fait ton endpoint
     //les differentes reponses http possible(200, 400, 401, 404, 500, etc.)
     @ApiResponses(value = {
@@ -49,8 +49,11 @@ public class PlayerController {
             )
     })
     @GetMapping("{lastName}")
-    public Player get(@PathVariable String lastName) {
-        return null;
+    public Player getByLastName(@PathVariable("lastName") String lastName) {
+        return PlayerList.ALL.stream()
+                .filter(player -> player.lastName().equals(lastName))
+                .findFirst()
+                .orElse(null);
     }
 
     @Operation(summary = "Create player", description = "Create player")//décrit ce que fait ton endpoint
