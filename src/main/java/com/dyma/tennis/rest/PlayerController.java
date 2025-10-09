@@ -1,5 +1,6 @@
 package com.dyma.tennis.rest;
 
+import com.dyma.tennis.Error;
 import com.dyma.tennis.HealthCheck;
 import com.dyma.tennis.Player;
 import com.dyma.tennis.PlayerList;
@@ -41,15 +42,16 @@ public class PlayerController {
     public List<Player> list() {
         return playerserv.getAllPlayers();
     }
-    @Operation(summary = "Finds a player", description = "Finds a player")//décrit ce que fait ton endpoint
-    //les differentes reponses http possible(200, 400, 401, 404, 500, etc.)
+    @Operation(summary = "Finds a player", description = "Finds a player")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Player",
                     content = {@Content(mediaType = "application/json",
                             schema = @Schema(implementation = Player.class))}),
-            @ApiResponse(responseCode = "404", description = "Not found")
-
+            @ApiResponse(responseCode = "404", description = "Player with specified last name not found",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = Error.class))})
     })
+
     @GetMapping("{lastName}")
     public Player getByLastName(@PathVariable("lastName") String lastName) {
         return playerserv.getByLastName(lastName);
