@@ -1,0 +1,25 @@
+package com.dyma.tennis.service;
+
+import com.dyma.tennis.Player;
+import com.dyma.tennis.PlayerList;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+public class PlayerService {
+    public List<Player> getAllPlayers() {
+        return PlayerList.ALL.stream()
+                .sorted(Comparator.comparing(player -> player.rank().position()))
+                .collect(Collectors.toList());
+    }
+    public Player getByLastName(String lastName) {
+        return PlayerList.ALL.stream()
+                .filter(player -> player.lastName().equals(lastName))
+                .findFirst()
+                .orElseThrow(()->new PlayerNotFoundException(lastName));
+}}

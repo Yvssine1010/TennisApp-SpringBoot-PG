@@ -3,6 +3,7 @@ package com.dyma.tennis.rest;
 import com.dyma.tennis.HealthCheck;
 import com.dyma.tennis.Player;
 import com.dyma.tennis.PlayerList;
+import com.dyma.tennis.service.PlayerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -10,14 +11,19 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.Collections;
 import java.util.List;
+
+
 @Tag(name = "Tennis Players")
 @RestController
 @RequestMapping("/players")
 public class PlayerController {
+    @Autowired
+    private PlayerService playerserv;
     @Operation(summary = "Finds players", description = "Finds players")//décrit ce que fait ton endpoint
     //les differentes reponses http possible(200, 400, 401, 404, 500, etc.)
     @ApiResponses(value = {
@@ -33,27 +39,20 @@ public class PlayerController {
     })
     @GetMapping
     public List<Player> list() {
-        return PlayerList.ALL;
+        return playerserv.getAllPlayers();
     }
-    @Operation(summary = "Finds player", description = "Finds player")//décrit ce que fait ton endpoint
+    @Operation(summary = "Finds a player", description = "Finds a player")//décrit ce que fait ton endpoint
     //les differentes reponses http possible(200, 400, 401, 404, 500, etc.)
     @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "pLaYeRs lIsT",
-                    content = {
-                            @Content(mediaType = "application/json",
-                                    schema = @Schema(implementation = Player.class)),
-                            @Content(mediaType = "application/xml",
-                                    schema = @Schema(implementation = Player.class))}
-            )
+            @ApiResponse(responseCode = "200", description = "Player",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = Player.class))}),
+            @ApiResponse(responseCode = "404", description = "Not found")
+
     })
     @GetMapping("{lastName}")
     public Player getByLastName(@PathVariable("lastName") String lastName) {
-        return PlayerList.ALL.stream()
-                .filter(player -> player.lastName().equals(lastName))
-                .findFirst()
-                .orElse(null);
+        return playerserv.getByLastName(lastName);
     }
 
     @Operation(summary = "Create player", description = "Create player")//décrit ce que fait ton endpoint
@@ -70,7 +69,7 @@ public class PlayerController {
             )
     })
     @PostMapping
-    public Player create(@RequestBody Player newPlayer) {
+    public Player create(@RequestBody @Valid Player newPlayer) {
         return newPlayer;
     }
 
@@ -88,7 +87,7 @@ public class PlayerController {
             )
     })
     @PutMapping
-    public Player updatePlayer(@RequestBody Player newPlayer) {
+    public Player updatePlayer(@RequestBody @Valid Player newPlayer) {
         return newPlayer;
     }
     @ApiResponses(value = {
