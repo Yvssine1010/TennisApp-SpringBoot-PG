@@ -1,9 +1,7 @@
 package com.dyma.tennis.rest;
 
+import com.dyma.tennis.*;
 import com.dyma.tennis.Error;
-import com.dyma.tennis.HealthCheck;
-import com.dyma.tennis.Player;
-import com.dyma.tennis.PlayerList;
 import com.dyma.tennis.service.PlayerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -15,7 +13,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import java.util.Collections;
+
 import java.util.List;
 
 
@@ -25,6 +23,7 @@ import java.util.List;
 public class PlayerController {
     @Autowired
     private PlayerService playerserv;
+    String a ;;
     @Operation(summary = "Finds players", description = "Finds players")//décrit ce que fait ton endpoint
     //les differentes reponses http possible(200, 400, 401, 404, 500, etc.)
     @ApiResponses(value = {
@@ -59,6 +58,7 @@ public class PlayerController {
 
     @Operation(summary = "Create player", description = "Create player")//décrit ce que fait ton endpoint
     //les differentes reponses http possible(200, 400, 401, 404, 500, etc.)
+    /*met à jour le contrôleurREST qui va traiter les requêtes de création*/
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
@@ -71,8 +71,8 @@ public class PlayerController {
             )
     })
     @PostMapping
-    public Player create(@RequestBody @Valid Player newPlayer) {
-        return newPlayer;
+    public Player create(@RequestBody @Valid PlayerToSave newPlayer) {
+        return playerserv.create(newPlayer);
     }
 
     @Operation(summary = "Update a  player", description = "Update a  player")//décrit ce que fait ton endpoint
@@ -86,11 +86,16 @@ public class PlayerController {
                                     schema = @Schema(implementation = Player.class)),
                             @Content(mediaType = "application/xml",
                                     schema = @Schema(implementation = Player.class))}
-            )
+            ),
+            @ApiResponse(responseCode = "404", description = "Player with specified last name not found",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = Error.class))})
     })
+
+
     @PutMapping
-    public Player updatePlayer(@RequestBody @Valid Player newPlayer) {
-        return newPlayer;
+    public Player updatePlayer(@RequestBody @Valid PlayerToSave playerToSave) {
+        return playerserv.update(playerToSave);
     }
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Player deleted successfully"),
