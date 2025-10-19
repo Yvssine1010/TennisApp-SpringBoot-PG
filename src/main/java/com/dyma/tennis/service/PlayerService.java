@@ -33,25 +33,23 @@ public class PlayerService {
     }
     //====================================================================mettre à jour un joueur====================================================================//
     public Player update(PlayerToSave playertosave) {
-        getByLastName(playertosave.lastName());//Cette méthode vérifie que le joueur existe déjà dans la liste.
+        // 1️⃣ Vérifie si un joueur avec ce nom existe déjà dans la liste.
+        getByLastName(playertosave.lastName());
 
-        List<Player> playerswithoutPlayertoupdate=PlayerList.ALL.stream() //Création de la liste sans le joueur à mettre à jour
+        // 2️⃣ Crée une nouvelle liste de joueurs sans celui qu'on souhaite mettre à jour.
+        List<Player> playerswithoutPlayertoupdate = PlayerList.ALL.stream()
                 .filter(player -> !player.lastName().equals(playertosave.lastName()))
                 .toList();
 
-        RankingCalculator rankingCalculator = new RankingCalculator(playerswithoutPlayertoupdate, playertosave);
-        List<Player> players = rankingCalculator.getNewPlayersRanking();
-
-        return players.stream() //Une fois le classement recalculé, on cherche dans la nouvelle liste le joueur correspondant et On retourne donc le joueur mis à jour avec son nouveau classement.
-                .filter(player -> player.lastName().equals(playertosave.lastName()))
-                .findFirst().get();
-        /*Tu veux mettre à jour Alcaraz avec 8200 points :
-
-1️⃣ On vérifie qu’il existe.
-2️⃣ On retire Alcaraz de la liste.
-3️⃣ On ajoute le nouveau Alcaraz (avec 8200 pts) → recalcul du classement.
-4️⃣ On renvoie le nouvel Alcaraz avec son nouveau rang.*/
+        // 3️⃣ Recalcule le classement en ajoutant le joueur mis à jour et retourne ce joueur avec son nouveau rang.
+        // Exemple : si on veut mettre à jour "Alcaraz" avec 8200 points :
+        //    a) On vérifie qu'il existe.
+        //    b) On le retire de la liste.
+        //    c) On l'ajoute avec ses nouveaux points → recalcul du classement.
+        //    d) On renvoie le joueur mis à jour avec son nouveau rang.
+        return getPlayerNewRanking(playerswithoutPlayertoupdate, playertosave);
     }
+
     //====================================================================================================================//
     //La méthode n’est accessible que depuis la classe où elle est définie. pour l'utilise dans des autres methodes
     private Player getPlayerNewRanking(List<Player> existingPlayer, PlayerToSave playerToSave) {
