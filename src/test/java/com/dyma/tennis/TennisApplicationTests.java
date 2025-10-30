@@ -25,5 +25,6 @@ class TennisApplicationTests {
 		Assertions.assertNotNull(healthcheckService);
 
 	}
+	
 
 }

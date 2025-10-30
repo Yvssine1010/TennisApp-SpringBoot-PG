@@ -1,6 +1,7 @@
 package com.dyma.tennis.service;
 
 import com.dyma.tennis.Player;
+import com.dyma.tennis.PlayerList;
 import com.dyma.tennis.PlayerToSave;
 import com.dyma.tennis.Rank;
 
@@ -25,18 +26,22 @@ public class RankingCalculator {
         this.currentPlayersRanking = currentPlayersRanking;
         this.playerToSave = playerToSave;
     }
+    public RankingCalculator(List<Player> currentPlayersRanking) {
+        this.currentPlayersRanking = currentPlayersRanking;
+        this.playerToSave = null;
+    }
 
     public List<Player> getNewPlayersRanking() {
         // 1️⃣ Copie la liste actuelle pour ne pas modifier l'originale
         List<Player> newRankingList = new ArrayList<>(currentPlayersRanking);
-
-        // 2️⃣ Ajoute le nouveau joueur avec un rang temporaire très élevé
-        newRankingList.add(new Player(
-                playerToSave.firstName(),
-                playerToSave.lastName(),
-                playerToSave.birthDate(),
-                new Rank(999999999, playerToSave.points())
-        ));
+        if (playerToSave != null) {
+            newRankingList.add(new Player(
+                    playerToSave.firstName(),
+                    playerToSave.lastName(),
+                    playerToSave.birthDate(),
+                    new Rank(999999999, playerToSave.points())
+            ));
+        }
 
         // 3️⃣ Trie la liste par points décroissants pour que le joueur avec le plus de points soit premier
         newRankingList.sort((p1, p2) -> Integer.compare(p2.rank().point(), p1.rank().point()));
@@ -53,6 +58,7 @@ public class RankingCalculator {
             );
             updatedPlayers.add(updatedPlayer);
         }
+        PlayerList.ALL = updatedPlayers;
 
         // 5️⃣ Retourne la liste finale avec tous les joueurs et leur nouveau rang
         return updatedPlayers;

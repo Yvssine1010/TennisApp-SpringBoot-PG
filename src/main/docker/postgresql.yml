@@ -1,14 +1,34 @@
-version: "3.8"
-
 services:
-  postgres:
-    image: postgres:16
-    container_name: mon_postgres
+  # Nom du service (le conteneur)
+  yassine-postgresql:
+    # Image Docker officielle de PostgreSQL version 15
+    image: postgres:15
+
+    # Nom du conteneur (facilite l'identification dans Docker)
+    container_name: yassine-postgres
+
+
+    # Variables d'environnement nécessaires au démarrage de PostgreSQL
     environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: root
-      POSTGRES_DB: mydatabase
+      # Nom d'utilisateur par défaut du super administrateur PostgreSQL
+      - POSTGRES_USER=postgres
+      # Mot de passe associé à l'utilisateur
+      - POSTGRES_PASSWORD=postgres
+
+    # Configuration du port : "port hôte : port du conteneur"
+    # Cela permet d'accéder à PostgreSQL depuis ton ordinateur sur le port 5432
     ports:
-      - "5432:5432"
+      - '5432:5432'
+
+    # Volumes : permettent de sauvegarder les données et d'exécuter un script d'init
     volumes:
+      # Sauvegarde persistante des données PostgreSQL sur ton disque local
+      # ./postgres-data = dossier local
+      # /var/lib/postgresql/data = dossier où PostgreSQL stocke ses fichiers de base de données
       - ./postgres-data:/var/lib/postgresql/data
+
+      # Script SQL d’initialisation exécuté automatiquement au démarrage
+      # ./init.sql = fichier SQL local
+      # /docker-entrypoint-initdb.d/init.sql = dossier spécial dans le conteneur où
+      # PostgreSQL exécute tous les fichiers .sql au premier lancement
+      - ./init.sql:/d
